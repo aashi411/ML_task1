@@ -11,4 +11,4 @@ model = DeliveryModel()
 with open("delivery_model.pkl", "wb") as file:
     pickle.dump(model, file)
 
-print("Model saved as delivery_model.pkl")
+print("Model saved successfully")
