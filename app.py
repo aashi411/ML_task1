@@ -11,10 +11,8 @@ app = Flask(__name__)
 # Enable CORS
 CORS(app)
 
-# -----------------------------
+
 # MODEL DEFINITION
-# -----------------------------
-# This class MUST match train.py
 class DeliveryModel:
 
     def __init__(self):
@@ -30,10 +28,8 @@ class DeliveryModel:
         )
 
 
-# -----------------------------
+
 # CUSTOM UNPICKLER FIX
-# -----------------------------
-# Fixes Render/Gunicorn pickle issue
 class ModelUnpickler(pickle.Unpickler):
 
     def find_class(self, module, name):
@@ -44,9 +40,8 @@ class ModelUnpickler(pickle.Unpickler):
         return super().find_class(module, name)
 
 
-# -----------------------------
+
 # RATE LIMITER
-# -----------------------------
 limiter = Limiter(
     get_remote_address,
     app=app,
@@ -54,9 +49,8 @@ limiter = Limiter(
     storage_uri="memory://",
 )
 
-# -----------------------------
+
 # LOAD MODEL
-# -----------------------------
 model = None
 
 MODEL_PATH = os.path.join(
@@ -80,9 +74,8 @@ except Exception as e:
     print(f"Error loading model: {e}")
 
 
-# -----------------------------
+
 # HOME ROUTE
-# -----------------------------
 @app.route("/")
 @limiter.exempt
 def home():
@@ -181,9 +174,7 @@ def home():
     """
 
 
-# -----------------------------
 # HEALTH CHECK
-# -----------------------------
 @app.route("/health", methods=["GET"])
 def health_check():
 
@@ -194,9 +185,8 @@ def health_check():
     })
 
 
-# -----------------------------
+
 # PREDICTION ROUTE
-# -----------------------------
 @app.route("/predict", methods=["POST"])
 @limiter.limit("10 per minute")
 def predict():
@@ -260,9 +250,7 @@ def predict():
         }), 500
 
 
-# -----------------------------
 # RATE LIMIT ERROR
-# -----------------------------
 @app.errorhandler(429)
 def ratelimit_handler(e):
 
@@ -272,9 +260,8 @@ def ratelimit_handler(e):
     }), 429
 
 
-# -----------------------------
+
 # MAIN
-# -----------------------------
 if __name__ == "__main__":
 
     port = int(
